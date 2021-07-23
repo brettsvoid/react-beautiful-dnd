@@ -50,6 +50,12 @@ export default class ErrorBoundary extends React.Component<Props> {
   onWindowError = (event: ErrorEvent) => {
     const callbacks: AppCallbacks = this.getCallbacks();
 
+    // Ignoring this error as explained here: https://stackoverflow.com/a/50387233/1407358
+    // Paired with react-virtuoso and items changing height during dragging, this error is thrown and caught by react-beautiful-dnd. Ideally we want to catch and handle the error before it reaches rdnd. But haven't found a nice way to do that yet.
+    if (event.message === 'ResizeObserver loop limit exceeded') {
+      return;
+    }
+
     if (callbacks.isDragging()) {
       callbacks.tryAbort();
       warning(`
